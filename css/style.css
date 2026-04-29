@@ -1077,6 +1077,64 @@ section { padding: 7rem 2rem; }
   background: var(--gold-dk);
 }
 
+/* === PAGINATION === */
+.presentes-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.page-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--gold-lt);
+  background: var(--white);
+  color: var(--gold-dk);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.page-num:hover {
+  border-color: var(--gold);
+  background: var(--cream);
+}
+
+.page-num.active {
+  background: var(--gold);
+  color: var(--white);
+  border-color: var(--gold);
+  font-weight: 600;
+}
+
+.btn-page-prev,
+.btn-page-next {
+  padding: 0.7rem 1.2rem;
+  border: 1px solid var(--gold-lt);
+  background: var(--white);
+  color: var(--gold-dk);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-page-prev:hover,
+.btn-page-next:hover {
+  border-color: var(--gold);
+  background: var(--cream);
+  color: var(--gold);
+}
+
 /* === CONFIRMAÇÃO === */
 #confirmacao {
   background: linear-gradient(135deg, var(--dark-2) 0%, #100c08 100%);
@@ -1356,6 +1414,17 @@ section { padding: 7rem 2rem; }
 .btn-mp.loading {
   opacity: 0.7;
   pointer-events: none;
+}
+
+.btn-mp-pix {
+  background: #1d8f5a;
+  border-color: #1d8f5a;
+  color: #fff;
+}
+
+.btn-mp-pix:hover {
+  background: #157448;
+  border-color: #157448;
 }
 
 .mp-security {

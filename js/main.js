@@ -134,11 +134,10 @@ const presentes = [
   // === TESTE ===
   { emoji:'🧪', name:'Teste de Pagamento', desc:'Presente de teste para validar o checkout do Mercado Pago. Remover após validação.', value:1, categoria:'teste', pix:PIX_KEY },
 
-  // === COZINHA & GOURMET (15) ===
+  // === COZINHA & GOURMET (14) ===
   { emoji:'🍳', img:IMG('1584990347193-6bebebfeaeee'), name:'Jogo de Panelas 7 peças', desc:'Conjunto de panelas antiaderentes de alta resistência, ideais para o novo lar.', value:650, categoria:'cozinha', pix:PIX_KEY },
   { emoji:'☕', img:IMG('1531937465322-9909ce13f8ca'), name:'Cafeteira Expresso', desc:'Máquina de café expresso automática com moedor integrado e vaporizador de leite.', value:890, categoria:'cozinha', pix:PIX_KEY },
-  { emoji:'🍷', img:IMG('1611575189074-9dfbbceb258a'), name:'Adega de Vinhos 12 garrafas', desc:'Adega climatizada, temperatura controlada e luz UV. Para brindar a vida a dois.', value:720, categoria:'cozinha', pix:PIX_KEY },
-  { emoji:'🍽️', img:IMG('1620818309896-df4306ec95d8'), name:'Jogo de Pratos Porcelana 20 pç', desc:'Aparelho de jantar em porcelana branca, bordas delicadas, 20 peças.', value:480, categoria:'cozinha', pix:PIX_KEY },
+  { emoji:'️', img:IMG('1620818309896-df4306ec95d8'), name:'Jogo de Pratos Porcelana 20 pç', desc:'Aparelho de jantar em porcelana branca, bordas delicadas, 20 peças.', value:480, categoria:'cozinha', pix:PIX_KEY },
   { emoji:'🥂', img:IMG('1498429152472-9a433d9ddf3b'), name:'Jogo de Taças de Cristal', desc:'12 taças em cristal boêmio: vinho tinto, branco e champagne.', value:420, categoria:'cozinha', pix:PIX_KEY },
   { emoji:'🍟', img:IMG('1774074645537-f72f70d40d12'), name:'Air Fryer 5 Litros', desc:'Fritadeira elétrica sem óleo, capacidade familiar e painel digital.', value:550, categoria:'cozinha', pix:PIX_KEY },
   { emoji:'🥤', img:IMG('1622818426197-d54f85b88690'), name:'Liquidificador Alta Potência', desc:'1200W, jarra de vidro, lâminas de titânio. Para sucos, vitaminas e sopas.', value:320, categoria:'cozinha', pix:PIX_KEY },
@@ -230,15 +229,32 @@ function renderPresentesFiltros() {
   });
 }
 
+let currentPage = 1;
+const ITEMS_PER_PAGE = 12;
+
 function renderPresentes() {
   const grid = document.getElementById('presentesGrid');
   const lista = filtroAtivo === 'todos'
     ? presentes
     : presentes.filter(p => p.categoria === filtroAtivo);
 
-  // Imagens reais do Unsplash; cai no emoji se a imagem falhar.
+  currentPage = 1;
+
+  if (!lista.length) {
+    grid.innerHTML = '<p class="presentes-empty">Nenhum presente nessa categoria ainda. Escolha outra 💛</p>';
+    // Remove pagination if exists
+    const existingPagination = document.querySelector('.presentes-pagination');
+    if (existingPagination) existingPagination.remove();
+    return;
+  }
+
+  // Render only current page (12 items)
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const paginatedList = lista.slice(startIdx, endIdx);
+
   const USE_IMAGES = true;
-  grid.innerHTML = lista.map(p => {
+  grid.innerHTML = paginatedList.map(p => {
     const globalIdx = presentes.indexOf(p);
     const fallback = `<div class="presente-img-fallback">${p.emoji || '🎁'}</div>`;
     const media = (USE_IMAGES && p.img)
@@ -260,27 +276,71 @@ function renderPresentes() {
     `;
   }).join('');
 
-  if (!lista.length) {
-    grid.innerHTML = '<p class="presentes-empty">Nenhum presente nessa categoria ainda. Escolha outra 💛</p>';
-  }
-
   // Re-observe new cards
   grid.querySelectorAll('.reveal').forEach((el, i) => {
     el.style.transitionDelay = (i * 0.08) + 's';
     observer.observe(el);
   });
+
+  // Render pagination
+  const totalPages = Math.ceil(lista.length / ITEMS_PER_PAGE);
+  if (totalPages > 1) {
+    let paginationHtml = '<div class="presentes-pagination">';
+    
+    if (currentPage > 1) {
+      paginationHtml += `<button class="btn-page-prev" onclick="goToPresentePage(${currentPage - 1}, '${filtroAtivo}')">← Anterior</button>`;
+    }
+    
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === currentPage) {
+        paginationHtml += `<span class="page-num active">${i}</span>`;
+      } else {
+        paginationHtml += `<button class="page-num" onclick="goToPresentePage(${i}, '${filtroAtivo}')">${i}</button>`;
+      }
+    }
+    
+    if (currentPage < totalPages) {
+      paginationHtml += `<button class="btn-page-next" onclick="goToPresentePage(${currentPage + 1}, '${filtroAtivo}')">Próxima →</button>`;
+    }
+    
+    paginationHtml += '</div>';
+    
+    // Remove existing pagination if any
+    const existingPagination = document.querySelector('.presentes-pagination');
+    if (existingPagination) existingPagination.remove();
+    
+    grid.insertAdjacentHTML('afterend', paginationHtml);
+  } else {
+    // Remove pagination if only 1 page
+    const existingPagination = document.querySelector('.presentes-pagination');
+    if (existingPagination) existingPagination.remove();
+  }
 }
 
 renderPresentesFiltros();
 renderPresentes();
+
+function goToPresentePage(page, category) {
+  currentPage = page;
+  filtroAtivo = category || filtroAtivo;
+  renderPresentes();
+  const section = document.getElementById('presentes');
+  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
 
 // === MODAL PRESENTES (Mercado Pago) ===
 const modal      = document.getElementById('pixModal');
 const closeModal = document.getElementById('closeModal');
 const btnMP      = document.getElementById('btnMercadoPago');
+const btnMPPix   = document.getElementById('btnMercadoPagoPix');
 const btnPix     = document.getElementById('btnPix');
 const mpFallback = document.getElementById('mpFallback');
+
+const MP_BTN_LABELS = {
+  credit_card: '💳 Pagar com Cartão de Crédito (Mercado Pago) →',
+  pix:         '⚡ Pagar com PIX (Mercado Pago) →'
+};
 const pixBox     = document.getElementById('pixBox');
 const pixKeyEl   = document.getElementById('pixKey');
 const btnPixWhats = document.getElementById('btnPixWhats');
@@ -340,7 +400,9 @@ function openModal(index) {
 
   // reset estados
   btnMP.classList.remove('loading', 'hidden');
-  btnMP.textContent = 'Pagar no Mercado Pago (PIX, cartão ou boleto) →';
+  btnMP.textContent = MP_BTN_LABELS.credit_card;
+  btnMPPix.classList.remove('loading', 'hidden');
+  btnMPPix.textContent = MP_BTN_LABELS.pix;
   pixBox.classList.add('hidden');
   pixKeyEl.textContent = p.pix || PIX_KEY;
   btnPixWhats.href = 'https://wa.me/5511916376717';
@@ -378,8 +440,7 @@ function showMpError(msg) {
   btnMP.insertAdjacentElement('afterend', el);
 }
 
-btnMP.addEventListener('click', async e => {
-  e.preventDefault();
+async function startMercadoPagoCheckout(btn, paymentMethod) {
   if (!currentGift) return;
 
   const buyer = validateBuyer();
@@ -390,8 +451,8 @@ btnMP.addEventListener('click', async e => {
     return;
   }
 
-  btnMP.classList.add('loading');
-  btnMP.textContent = 'Gerando link seguro...';
+  btn.classList.add('loading');
+  btn.textContent = 'Gerando link seguro...';
   removeMpError();
 
   try {
@@ -400,6 +461,7 @@ btnMP.addEventListener('click', async e => {
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
         action: 'mp_checkout',
+        paymentMethod, // 'credit_card' | 'pix'
         gift: {
           name:  currentGift.name,
           desc:  currentGift.desc,
@@ -415,18 +477,28 @@ btnMP.addEventListener('click', async e => {
     const data = await res.json();
 
     if (data.status === 'ok' && data.init_point) {
-      btnMP.textContent = 'Abrindo Mercado Pago...';
+      btn.textContent = 'Abrindo Mercado Pago...';
       window.location.href = data.init_point;
     } else {
       console.error('MP erro detalhado:', data);
       throw new Error(data.message || 'Resposta inesperada do servidor.');
     }
   } catch (err) {
-    btnMP.classList.remove('loading');
-    btnMP.textContent = 'Tentar novamente';
+    btn.classList.remove('loading');
+    btn.textContent = 'Tentar novamente';
     showMpError('Erro: ' + err.message);
     console.error(err);
   }
+}
+
+btnMP.addEventListener('click', e => {
+  e.preventDefault();
+  startMercadoPagoCheckout(btnMP, 'credit_card');
+});
+
+btnMPPix.addEventListener('click', e => {
+  e.preventDefault();
+  startMercadoPagoCheckout(btnMPPix, 'pix');
 });
 
 btnPix.addEventListener('click', e => {
