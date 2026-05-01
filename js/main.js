@@ -333,13 +333,11 @@ function goToPresentePage(page, category) {
 const modal      = document.getElementById('pixModal');
 const closeModal = document.getElementById('closeModal');
 const btnMP      = document.getElementById('btnMercadoPago');
-const btnMPPix   = document.getElementById('btnMercadoPagoPix');
 const btnPix     = document.getElementById('btnPix');
 const mpFallback = document.getElementById('mpFallback');
 
 const MP_BTN_LABELS = {
-  credit_card: '💳 Pagar com Cartão de Crédito (Mercado Pago) →',
-  pix:         '⚡ Pagar com PIX (Mercado Pago) →'
+  credit_card: '💳 Pagar com Cartão de Crédito (Mercado Pago) →'
 };
 const pixBox     = document.getElementById('pixBox');
 const pixKeyEl   = document.getElementById('pixKey');
@@ -401,8 +399,6 @@ function openModal(index) {
   // reset estados
   btnMP.classList.remove('loading', 'hidden');
   btnMP.textContent = MP_BTN_LABELS.credit_card;
-  btnMPPix.classList.remove('loading', 'hidden');
-  btnMPPix.textContent = MP_BTN_LABELS.pix;
   pixBox.classList.add('hidden');
   pixKeyEl.textContent = p.pix || PIX_KEY;
   btnPixWhats.href = 'https://wa.me/5511916376717';
@@ -494,11 +490,6 @@ async function startMercadoPagoCheckout(btn, paymentMethod) {
 btnMP.addEventListener('click', e => {
   e.preventDefault();
   startMercadoPagoCheckout(btnMP, 'credit_card');
-});
-
-btnMPPix.addEventListener('click', e => {
-  e.preventDefault();
-  startMercadoPagoCheckout(btnMPPix, 'pix');
 });
 
 btnPix.addEventListener('click', e => {
