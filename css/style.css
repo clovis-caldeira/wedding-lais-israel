@@ -671,16 +671,46 @@ section { padding: 7rem 2rem; }
 }
 
 .padrinho-avatar {
-  width: 72px; height: 72px;
+  width: 110px; height: 110px;
   border-radius: 50%;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-serif);
-  font-size: 2rem;
+  font-size: 2.6rem;
   font-weight: 300;
   color: var(--white);
+  position: relative;
+  border: 2px solid var(--gold-lt);
+  box-shadow: 0 6px 20px rgba(30,20,10,0.18);
+  transition: transform 0.4s var(--ease), filter 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.padrinho-avatar.has-photo {
+  color: transparent;
+  background-size: cover;
+  background-position: var(--photo-pos, center top);
+  background-repeat: no-repeat;
+  filter: contrast(1.06) saturate(0.94) brightness(1.02);
+}
+
+.padrinho-avatar.has-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 22px rgba(30,20,10,0.22);
+  pointer-events: none;
+}
+
+.padrinho-card:hover .padrinho-avatar {
+  transform: scale(1.04);
+  box-shadow: 0 10px 26px rgba(30,20,10,0.24);
+}
+
+.padrinho-card:hover .padrinho-avatar.has-photo {
+  filter: contrast(1.09) saturate(1) brightness(1.04);
 }
 
 .padrinho-card h4 {
