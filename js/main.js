@@ -131,9 +131,6 @@ const IMG = (id) => `https://images.unsplash.com/photo-${id}?w=800&q=80&auto=for
 const PIX_KEY = '11972892128';
 
 const presentes = [
-  // === TESTE ===
-  { emoji:'🧪', name:'Teste de Pagamento', desc:'Presente de teste para validar o checkout do Mercado Pago. Remover após validação.', value:1, categoria:'teste', pix:PIX_KEY },
-
   // === COZINHA & GOURMET (14) ===
   { emoji:'🍳', img:IMG('1584990347193-6bebebfeaeee'), name:'Jogo de Panelas 7 peças', desc:'Conjunto de panelas antiaderentes de alta resistência, ideais para o novo lar.', value:650, categoria:'cozinha', pix:PIX_KEY },
   { emoji:'☕', img:IMG('1531937465322-9909ce13f8ca'), name:'Cafeteira Expresso', desc:'Máquina de café expresso automática com moedor integrado e vaporizador de leite.', value:890, categoria:'cozinha', pix:PIX_KEY },
