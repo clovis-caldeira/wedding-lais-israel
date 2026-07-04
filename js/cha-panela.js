@@ -114,6 +114,20 @@ const CHA_ITEMS = [
   { id: 99, categoria:'lavanderia', nome:'Escova de limpeza' },
   { id:100, categoria:'lavanderia', nome:'Luvas de borracha' },
   { id:101, categoria:'lavanderia', nome:'Organizador para produtos de limpeza' },
+
+  // === COZINHA (novos) ===
+  { id:102, categoria:'cozinha', nome:'Porta bolo com tampa' },
+  { id:103, categoria:'cozinha', nome:'Porta frios' },
+  { id:104, categoria:'cozinha', nome:'Luva térmica para forno' },
+  { id:105, categoria:'cozinha', nome:'Forma para gelos' },
+  { id:106, categoria:'cozinha', nome:'Centrifugador de salada' },
+  { id:107, categoria:'cozinha', nome:'Batedor de ovos' },
+  { id:108, categoria:'cozinha', nome:'Kit de pote para mantimentos' },
+  { id:109, categoria:'cozinha', nome:'Colher para sorvete' },
+  { id:110, categoria:'cozinha', nome:'Porta papel toalha' },
+
+  // === LAVANDERIA (novo) ===
+  { id:111, categoria:'lavanderia', nome:'Capacho para a porta de entrada' },
 ];
 
 // === ESTADO ===
