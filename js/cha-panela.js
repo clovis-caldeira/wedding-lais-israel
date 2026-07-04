@@ -277,11 +277,15 @@ btnConfirm.addEventListener('click', async () => {
 nameInput.addEventListener('input', () => nameInput.classList.remove('invalid'));
 
 // === API ===
+let carregando = false;
 async function carregarReservados() {
+  if (carregando) return;
+  carregando = true;
   try {
-    const r = await fetch(SHEETS_WEBAPP_URL, {
+    const r = await fetch(SHEETS_WEBAPP_URL + '?t=' + Date.now(), {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      cache: 'no-store',
       body: JSON.stringify({ action: 'cha_list_reservas' })
     });
     const data = await r.json();
@@ -294,6 +298,8 @@ async function carregarReservados() {
   } catch (err) {
     status.textContent = 'Não foi possível carregar a lista atualizada. Exibindo todos os itens.';
     console.error('Erro list reservas:', err);
+  } finally {
+    carregando = false;
   }
   render();
 }
@@ -301,9 +307,10 @@ async function carregarReservados() {
 async function reservar(produtoId, nome) {
   try {
     const item = CHA_ITEMS.find(i => i.id === produtoId);
-    const r = await fetch(SHEETS_WEBAPP_URL, {
+    const r = await fetch(SHEETS_WEBAPP_URL + '?t=' + Date.now(), {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      cache: 'no-store',
       body: JSON.stringify({
         action: 'cha_reservar',
         produtoId,
@@ -322,7 +329,14 @@ async function reservar(produtoId, nome) {
 }
 
 // === AUTO REFRESH (CA10) ===
-setInterval(carregarReservados, 30000); // 30s
+// Polling curto + refresh imediato quando a aba volta ao foco.
+setInterval(carregarReservados, 10000); // 10s
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) carregarReservados();
+});
+window.addEventListener('focus', carregarReservados);
+window.addEventListener('online', carregarReservados);
 
 // === INIT ===
 carregarReservados();
