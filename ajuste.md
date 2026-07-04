@@ -45,3 +45,105 @@ Bloco 1 — Na conta MP do noivo
   validar CPF/identidade primeiro
 
   Me avisa quando tiver o Access Token novo em mãos que te acompanho na troca.
+
+---
+
+## Chá de Panela — setup no Apps Script + planilha
+
+### 1) Criar a aba "Presentes Escolhidos" na mesma planilha
+
+Cabeçalho na linha 1, exatamente nessa ordem:
+
+| Data | Produto ID | Produto | Categoria | Nome |
+|---|---|---|---|---|
+
+Não precisa cadastrar produtos numa aba separada — a lista fica em
+`wedding/js/cha-panela.js` (constante `CHA_ITEMS`, IDs 1 a 101). Se
+quiser adicionar itens depois, é só acrescentar no fim do array com um
+ID novo (nunca reutilizar ID de item já reservado).
+
+### 2) Colar este snippet no Apps Script (mesmo arquivo do MP)
+
+O front chama `action: 'cha_list_reservas'` (retorna IDs já reservados)
+e `action: 'cha_reservar'` (grava a reserva com trava anti-corrida).
+
+```javascript
+// === CHÁ DE PANELA ===
+var CHA_SHEET_NAME = 'Presentes Escolhidos';
+
+function chaListReservas() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CHA_SHEET_NAME);
+  if (!sheet) return { status: 'ok', reservados: [] };
+  var last = sheet.getLastRow();
+  if (last < 2) return { status: 'ok', reservados: [] };
+  var ids = sheet.getRange(2, 2, last - 1, 1).getValues()
+    .map(function(r) { return Number(r[0]); })
+    .filter(function(n) { return !isNaN(n); });
+  return { status: 'ok', reservados: ids };
+}
+
+function chaReservar(payload) {
+  var produtoId = Number(payload.produtoId);
+  var nome      = String(payload.nome || '').trim();
+  var produto   = String(payload.produto || '').trim();
+  var categoria = String(payload.categoria || '').trim();
+
+  if (!produtoId || !nome) {
+    return { status: 'error', message: 'produtoId e nome são obrigatórios.' };
+  }
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(15000); // 15s
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(CHA_SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(CHA_SHEET_NAME);
+      sheet.appendRow(['Data', 'Produto ID', 'Produto', 'Categoria', 'Nome']);
+    }
+    var last = sheet.getLastRow();
+    if (last >= 2) {
+      var existentes = sheet.getRange(2, 2, last - 1, 1).getValues();
+      for (var i = 0; i < existentes.length; i++) {
+        if (Number(existentes[i][0]) === produtoId) {
+          return { status: 'conflict', conflict: true, message: 'Presente já reservado.' };
+        }
+      }
+    }
+    sheet.appendRow([new Date(), produtoId, produto, categoria, nome]);
+    return { status: 'ok', success: true };
+  } catch (err) {
+    return { status: 'error', message: String(err) };
+  } finally {
+    lock.releaseLock();
+  }
+}
+```
+
+### 3) Rotear as novas actions no `doPost`
+
+Dentro do `doPost` existente, logo antes do fallback, adicione:
+
+```javascript
+if (payload.action === 'cha_list_reservas') {
+  return ContentService.createTextOutput(JSON.stringify(chaListReservas()))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+if (payload.action === 'cha_reservar') {
+  return ContentService.createTextOutput(JSON.stringify(chaReservar(payload)))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+### 4) Republicar
+
+`Implantar → Gerenciar implantações → ✏️ → Nova versão → Implantar`.
+A URL do webhook continua a mesma — o front já aponta para ela.
+
+### 5) Teste rápido
+
+1. Abrir `cha-panela.html` no site.
+2. Escolher um item, colocar um nome, confirmar.
+3. Conferir a nova linha na aba "Presentes Escolhidos".
+4. Tentar reservar o mesmo item de novo → deve aparecer a mensagem
+   "Este presente acabou de ser escolhido".
