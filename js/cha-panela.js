@@ -128,6 +128,19 @@ const CHA_ITEMS = [
 
   // === LAVANDERIA (novo) ===
   { id:111, categoria:'lavanderia', nome:'Capacho para a porta de entrada' },
+
+  // === COZINHA (lote 2 — copos, xicaras, pratos, bowls, jarras individuais) ===
+  { id:112, categoria:'cozinha', nome:'Copos' },
+  { id:113, categoria:'cozinha', nome:'Copos' },
+  { id:114, categoria:'cozinha', nome:'Xícaras de café' },
+  { id:115, categoria:'cozinha', nome:'Xícaras de chá' },
+  { id:116, categoria:'cozinha', nome:'Pratos rasos' },
+  { id:117, categoria:'cozinha', nome:'Pratos fundos' },
+  { id:118, categoria:'cozinha', nome:'Prato de sobremesa' },
+  { id:119, categoria:'cozinha', nome:'Bowls' },
+  { id:120, categoria:'cozinha', nome:'Tigelas' },
+  { id:121, categoria:'cozinha', nome:'Jarra de água' },
+  { id:122, categoria:'cozinha', nome:'Jarra de suco' },
 ];
 
 // === ESTADO ===
